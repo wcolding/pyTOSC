@@ -79,7 +79,7 @@ print(f'Total script replacements: {replacements}\n')
 # Second pass to duplicate iterable objects
 xml_iterable_buttons_group = root.find(".//*[key='iterableButton']......")
 
-if len(xml_iterable_buttons_group) > 0:
+if xml_iterable_buttons_group != None:
     xml_iterable_buttons = xml_iterable_buttons_group.findall(".//*[key='iterableButton']....")
 
     layout_config = ConfigParser()
