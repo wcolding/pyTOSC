@@ -1,3 +1,0 @@
-Submodules are lua scripts that get inserted into other lua scripts
-
-TK TK TK
