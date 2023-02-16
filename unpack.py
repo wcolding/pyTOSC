@@ -3,10 +3,6 @@ import zlib
 import xml.etree.ElementTree as ET
 import sys
 
-if (len(sys.argv) < 2):
-    print('Expected argument\nUsage: "python unpack.py toscFileName"')
-    exit()
-
 class TOSCName:
     text = ''
     modifier = ''
@@ -94,66 +90,67 @@ def GetRecursiveObjects(element: ET.Element, level = 0):
                                 value.text = '${' + obj.name.text + obj.name.modifier + '.lua}'
 
     return objs_list
-    
 
-file = io.open(sys.argv[1], 'rb')
-data = file.read()
-file.close()
-
-outputFile = 'default.xml'
-
-try:
-    uncompressed = zlib.decompress(data)
-except:
-    print('Could not decompress file. Was this file saved with TouchOSC Editor?')
-    uncompressed = data
-
-stringXML = uncompressed.decode('UTF-8')
-prettyXML = ET.XML(stringXML)
-
-xmlProperties = prettyXML.findall(".//property")
-for p in xmlProperties:
-    if p[0].text == 'projectName':
-        outputFile = f'{p[1].text}.xml'
-
-ET.indent(prettyXML)
-
-scriptObjs = GetRecursiveObjects(prettyXML)
-submoduleStart = 0
-submoduleNext = 0
-submoduleName = ''
-submoduleScript = ''
-submoduleFileName = ''
-
-for obj in scriptObjs:
-    filename = f'Lua/{obj.name.text}{obj.name.modifier}.lua'
-    print(f'Unpacking \'{obj.name.text}{obj.name.modifier}.lua\'...')
-    # Look for submodules
-    submoduleStart = 0
-    while submoduleStart != -1:
-        submoduleStart = obj.script.find('--Submodule.start(\'')
-        if submoduleStart > -1:
-            start = obj.script[0 : submoduleStart]
-            end = obj.script[submoduleStart + 19 :]
-            submoduleNext = end.find('\')')
-            submoduleName = end[0:submoduleNext]
-            submoduleFileName = f'Lua/Submodules/{submoduleName}'
-            print(f'Unpacking submodule \'{submoduleName}\'...')
-            
-            end = obj.script[submoduleNext + 2 :]
-            submoduleNext = obj.script.find('--Submodule.end()')
-            submoduleScript = obj.script[submoduleStart : submoduleNext + 17]
-
-            file = io.open(submoduleFileName, 'w')
-            file.write(submoduleScript)
-            file.close()
-
-            obj.script = obj.script.replace(submoduleScript, f'--Submodule.include(\'{submoduleName}\')')
-
-    file = io.open(filename, 'w')
-    file.write(obj.script)
+def Unpack(file_name):
+    print(f"Unpacking file {file_name}...")
+    file = io.open(file_name, 'rb')
+    data = file.read()
     file.close()
 
-file = io.open(outputFile, 'w')
-file.write(ET.tostring(prettyXML, encoding='unicode', method='xml'))
-file.close()
+    outputFile = 'default.xml'
+
+    try:
+        uncompressed = zlib.decompress(data)
+    except:
+        print('Could not decompress file. Was this file saved with TouchOSC Editor?')
+        uncompressed = data
+
+    stringXML = uncompressed.decode('UTF-8')
+    prettyXML = ET.XML(stringXML)
+
+    xmlProperties = prettyXML.findall(".//property")
+    for p in xmlProperties:
+        if p[0].text == 'projectName':
+            outputFile = f'{p[1].text}.xml'
+
+    ET.indent(prettyXML)
+
+    scriptObjs = GetRecursiveObjects(prettyXML)
+    submoduleStart = 0
+    submoduleNext = 0
+    submoduleName = ''
+    submoduleScript = ''
+    submoduleFileName = ''
+
+    for obj in scriptObjs:
+        filename = f'Lua/{obj.name.text}{obj.name.modifier}.lua'
+        print(f'Unpacking \'{obj.name.text}{obj.name.modifier}.lua\'...')
+        # Look for submodules
+        submoduleStart = 0
+        while submoduleStart != -1:
+            submoduleStart = obj.script.find('--Submodule.start(\'')
+            if submoduleStart > -1:
+                start = obj.script[0 : submoduleStart]
+                end = obj.script[submoduleStart + 19 :]
+                submoduleNext = end.find('\')')
+                submoduleName = end[0:submoduleNext]
+                submoduleFileName = f'Lua/Submodules/{submoduleName}'
+                print(f'Unpacking submodule \'{submoduleName}\'...')
+                
+                end = obj.script[submoduleNext + 2 :]
+                submoduleNext = obj.script.find('--Submodule.end()')
+                submoduleScript = obj.script[submoduleStart : submoduleNext + 17]
+
+                file = io.open(submoduleFileName, 'w')
+                file.write(submoduleScript)
+                file.close()
+
+                obj.script = obj.script.replace(submoduleScript, f'--Submodule.include(\'{submoduleName}\')')
+
+        file = io.open(filename, 'w')
+        file.write(obj.script)
+        file.close()
+
+    file = io.open(outputFile, 'w')
+    file.write(ET.tostring(prettyXML, encoding='unicode', method='xml'))
+    file.close()
