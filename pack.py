@@ -36,7 +36,7 @@ def Pack(xml_name):
             print(f'Found script reference: {lua_name}')
             
             try:
-                lua_file = io.open(f'Lua/{lua_name}', 'r')
+                lua_file = io.open(f'Lua\\{lua_name}', 'r')
                 lua_script = lua_file.read()
                 lua_file.close()
             except:
@@ -56,7 +56,7 @@ def Pack(xml_name):
                         print(f'Found submodule reference: \'{submodule_name}\'')
                         
                         try:
-                            lua_file = io.open(f'Lua/Submodules/{submodule_name}', 'r')
+                            lua_file = io.open(f'Lua\\Submodules\\{submodule_name}', 'r')
                             submodule_script = lua_file.read()
                             lua_file.close()
                         except:
@@ -198,7 +198,7 @@ def Pack(xml_name):
             build_index += 1
     else:
         build_name = f'Build/{xml_name[0:-4]} {version}.tosc'
-        build_data = data.encode('UTF-8')
+        build_data = main_data.encode('UTF-8')
         compressed = zlib.compress(build_data)
         
         file = io.open(build_name, 'wb')
