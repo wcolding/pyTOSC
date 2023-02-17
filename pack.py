@@ -197,7 +197,7 @@ def Pack(xml_name):
             print('----')
             build_index += 1
     else:
-        build_name = f'Build/{xml_name[1][0:-4]} v{version}.tosc'
+        build_name = f'Build/{xml_name[0:-4]} {version}.tosc'
         build_data = data.encode('UTF-8')
         compressed = zlib.compress(build_data)
         
