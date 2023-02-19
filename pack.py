@@ -149,7 +149,54 @@ def Pack(xml_name):
             if i > 0:
                 # Append new button
                 xml_iterable_buttons_group.append(curButton)
-            
+    
+    # Copy button to multiple tabs
+    xml_auto_pagers = root.findall(".//*[key='autoPager']....")
+    
+    if len(xml_auto_pagers) > 0:
+        tab_config = ConfigParser()
+        tab_config.read('tabs.ini')
+        tabs = tab_config.sections()
+        print(f'Tabs defined: {tabs}')
+
+        for pager in xml_auto_pagers:
+            pager_id = int(pager.find(".//*[key='autoPager']")[1].text)
+            print(f'Pager id: {pager_id}')
+            pager_children = pager.find(".//children")
+            current_tab_index = 0
+
+            for tab in tabs:
+                if int(tab_config[tab]['Pager']) == pager_id:
+                    tab_object = pager.find(".//children/node")
+                    if tab_object != None:
+                        if current_tab_index > 0:
+                            tab_object = copy.deepcopy(tab_object)
+
+                        tab_name = tab_object.find(".//*[key='name']")
+                        tab_label = tab_object.find(".//*[key='tabLabel']")
+                        tab_name[1].text = tab_config[tab]['Label']
+                        tab_label[1].text = tab_config[tab]['Label']
+
+                        tab_group = tab_object.find(".//children/node")
+                        if tab_group != None:
+                            tab_group_name = tab_group.find(".//*[key='name']")
+                            tab_group_tag = tab_group.find(".//*[key='tag']")
+                            mix_number = int(tab_config[tab]['MixBus'])
+                            print(f'Creating tab for MixBus {mix_number:02}...')
+                            tab_group_name[1].text = tab
+                            tab_group_tag[1].text = f'{mix_number:02}'
+                            
+                            if current_tab_index > 0:
+                                # Reassign UUIDs
+                                tab_nodes = tab_object.findall(".//children/node")
+                                if len(tab_nodes) > 0:
+                                    for node in tab_nodes:
+                                        node.set('ID', str(uuid.uuid4()))
+                                
+                                # Add new tab 
+                                pager_children.append(tab_object)
+
+                            current_tab_index += 1
 
     main_data = ET.tostring(root, encoding='unicode')
 
