@@ -74,11 +74,9 @@ def Pack(xml_name):
     print(f'Total script replacements: {replacements}\n')
 
     # Second pass to duplicate iterable objects
-    xml_iterable_buttons_group = root.find(".//*[key='iterableButton']......")
+    xml_iterable_buttons_groups = root.findall(".//*[key='iterableButton']......")
 
-    if xml_iterable_buttons_group != None:
-        xml_iterable_buttons = xml_iterable_buttons_group.findall(".//*[key='iterableButton']....")
-
+    if len(xml_iterable_buttons_groups) > 0:
         layout_config = ConfigParser()
         layout_config.read('mix_layout.ini')
 
@@ -92,65 +90,68 @@ def Pack(xml_name):
         buttons_per_row = int(layout_config['Default']['ButtonsPerRow'])
         text_size = int(layout_config['Default']['TextSize'])
 
-        for i in range(auto_channels):
-            if i == 0:
-                curButton = xml_iterable_buttons[0]
-            else:
-                curButton = copy.deepcopy(xml_iterable_buttons[0])
-            
-            children = curButton.findall(".//node")
-
-            name = curButton.find(".//*[key='name']")
-            tag = curButton.find(".//*[key='tag']")
-            iterable = curButton.find(".//*[key='iterableButton']")
-            frame = curButton.find(".//*[key='frame']")
-            name[1].text = f'Ch{i+1:02}'
-            tag[1].text = f'{i+1:02}'
-            iterable[1].text = '0'
-
-            if i == 0:
-                # Resize button
-                frame[1][2].text = str(button_width)
-                frame[1][3].text = str(button_height)
-
-                # Position button
-                frame[1][0].text = str(grid_start_x)
-                frame[1][1].text = str(grid_start_y)
-
-                # Operate on children (button and label)
-                for child in children:
-                    child_frame = child.find(".//*[key='frame']")
-                    child_frame[1][2].text = str(button_width)
-                    child_frame[1][3].text = str(button_height)
-            else:
-                # Reposition duplicate buttons
-                row = math.floor(i / buttons_per_row)
-                column = i % buttons_per_row
-
-                new_x = grid_start_x + ((button_width + padding_x) * column)
-                new_y = grid_start_y + ((button_height + padding_y) * row)
-
-                frame[1][0].text = str(new_x)
-                frame[1][1].text = str(new_y)
-
-            # Write default names for button labels and set text size
-            for child in children:
-                if child.get('type') == 'LABEL':
-                    text_val = child.find(".//*[key='text']")
-                    text_val[3].text = name[1].text
-                    text_size_val = child.find(".//*[key='textSize']")
-                    text_size_val[1].text = str(text_size)
-            # Update all UUIDs
-            curButton.set('ID', str(uuid.uuid4()))
-
-            for child in children:
-                child.set('ID', str(uuid.uuid4()))
+        for xml_iterable_buttons_group in xml_iterable_buttons_groups:
+            xml_iterable_buttons = xml_iterable_buttons_group.findall(".//*[key='iterableButton']....")
         
-            if i > 0:
-                # Append new button
-                xml_iterable_buttons_group.append(curButton)
+            for i in range(auto_channels):
+                if i == 0:
+                    curButton = xml_iterable_buttons[0]
+                else:
+                    curButton = copy.deepcopy(xml_iterable_buttons[0])
+                
+                children = curButton.findall(".//node")
+
+                name = curButton.find(".//*[key='name']")
+                tag = curButton.find(".//*[key='tag']")
+                iterable = curButton.find(".//*[key='iterableButton']")
+                frame = curButton.find(".//*[key='frame']")
+                name[1].text = f'Ch{i+1:02}'
+                tag[1].text = f'{i+1:02}'
+                iterable[1].text = '0'
+
+                if i == 0:
+                    # Resize button
+                    frame[1][2].text = str(button_width)
+                    frame[1][3].text = str(button_height)
+
+                    # Position button
+                    frame[1][0].text = str(grid_start_x)
+                    frame[1][1].text = str(grid_start_y)
+
+                    # Operate on children (button and label)
+                    for child in children:
+                        child_frame = child.find(".//*[key='frame']")
+                        child_frame[1][2].text = str(button_width)
+                        child_frame[1][3].text = str(button_height)
+                else:
+                    # Reposition duplicate buttons
+                    row = math.floor(i / buttons_per_row)
+                    column = i % buttons_per_row
+
+                    new_x = grid_start_x + ((button_width + padding_x) * column)
+                    new_y = grid_start_y + ((button_height + padding_y) * row)
+
+                    frame[1][0].text = str(new_x)
+                    frame[1][1].text = str(new_y)
+
+                # Write default names for button labels and set text size
+                for child in children:
+                    if child.get('type') == 'LABEL':
+                        text_val = child.find(".//*[key='text']")
+                        text_val[3].text = name[1].text
+                        text_size_val = child.find(".//*[key='textSize']")
+                        text_size_val[1].text = str(text_size)
+                # Update all UUIDs
+                curButton.set('ID', str(uuid.uuid4()))
+
+                for child in children:
+                    child.set('ID', str(uuid.uuid4()))
+            
+                if i > 0:
+                    # Append new button
+                    xml_iterable_buttons_group.append(curButton)
     
-    # Copy button to multiple tabs
+    # Iterate tabs
     xml_auto_pagers = root.findall(".//*[key='autoPager']....")
     
     if len(xml_auto_pagers) > 0:
@@ -181,8 +182,8 @@ def Pack(xml_name):
                         if tab_group != None:
                             tab_group_name = tab_group.find(".//*[key='name']")
                             tab_group_tag = tab_group.find(".//*[key='tag']")
-                            mix_number = int(tab_config[tab]['MixBus'])
-                            print(f'Creating tab for MixBus {mix_number:02}...')
+                            mix_number = int(tab_config[tab]['Index'])
+                            print(f'Creating tab for index {mix_number:02}...')
                             tab_group_name[1].text = tab
                             tab_group_tag[1].text = f'{mix_number:02}'
                             
