@@ -180,11 +180,9 @@ def Pack(xml_name):
 
                         tab_group = tab_object.find(".//children/node")
                         if tab_group != None:
-                            tab_group_name = tab_group.find(".//*[key='name']")
                             tab_group_tag = tab_group.find(".//*[key='tag']")
                             mix_number = int(tab_config[tab]['Index'])
                             print(f'Creating tab for index {mix_number:02}...')
-                            tab_group_name[1].text = tab
                             tab_group_tag[1].text = f'{mix_number:02}'
                             
                             if current_tab_index > 0:
