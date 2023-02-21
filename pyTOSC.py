@@ -1,7 +1,6 @@
 import sys
 import os
 
-
 full_dir = os.getcwd()
 working_index = full_dir.rfind("\\") + 1
 dir = full_dir[working_index:]
@@ -33,9 +32,23 @@ Arguments:
 
 def Clean():
     print("Clean selected")
+    build_files = os.listdir("Build")
+    for file in build_files:
+        if file != ".gitignore":
+            os.remove(f'Build\\{file}')
+    print("Build directory cleaned!")
 
 def CleanLua():
     print("Clean Lua selected")
+    lua_files = os.listdir("Lua")
+    for file in lua_files:
+        if file != "Submodules":
+            os.remove(f'Lua\\{file}')
+        else:
+            sub_files = os.listdir("Lua\\Submodules")
+            for sub in sub_files:
+                os.remove(f'Lua\\Submodules\\{sub}')
+    print("Lua directory cleaned!")
 
 def Help():
     print(help_string)
