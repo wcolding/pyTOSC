@@ -113,6 +113,24 @@ def Unpack(file_name):
         if p[0].text == 'projectName':
             outputFile = f'{p[1].text}.xml'
 
+    # Reduce iterableButtons to minimum for clean XML / easier version control
+    xml_iterable_buttons_groups = prettyXML.findall(".//*[key='iterableButton']......")
+    for xml_iterable_buttons_group in xml_iterable_buttons_groups:
+        repeated_buttons = []
+        xml_iterable_buttons = xml_iterable_buttons_group.findall(".//*[key='iterableButton']....")
+
+        for button in xml_iterable_buttons:
+            iterable = button.find(".//*[key='iterableButton']")
+            if iterable[1].text == '0':
+                repeated_buttons.append(button)
+    
+        print(len(repeated_buttons))
+        for button in repeated_buttons:
+            xml_iterable_buttons_group.remove(button)
+    
+    # Reduce autoPagers
+    # todo
+
     ET.indent(prettyXML)
 
     scriptObjs = GetRecursiveObjects(prettyXML)

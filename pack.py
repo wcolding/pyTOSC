@@ -107,7 +107,8 @@ def Pack(xml_name):
                 frame = curButton.find(".//*[key='frame']")
                 name[1].text = f'Ch{i+1:02}'
                 tag[1].text = f'{i+1:02}'
-                iterable[1].text = '0'
+                if i > 0:
+                    iterable[1].text = '0'
 
                 if i == 0:
                     # Resize button
