@@ -1,6 +1,6 @@
 import io
+import os
 import zlib
-import sys
 from configparser import ConfigParser
 import xml.etree.ElementTree as ET
 import copy
@@ -36,7 +36,7 @@ def Pack(xml_name):
             print(f'Found script reference: {lua_name}')
             
             try:
-                lua_file = io.open(f'Lua\\{lua_name}', 'r')
+                lua_file = io.open(os.path.normpath(f'Lua/{lua_name}'), 'r')
                 lua_script = lua_file.read()
                 lua_file.close()
             except:
@@ -56,7 +56,7 @@ def Pack(xml_name):
                         print(f'Found submodule reference: \'{submodule_name}\'')
                         
                         try:
-                            lua_file = io.open(f'Lua\\Submodules\\{submodule_name}', 'r')
+                            lua_file = io.open(os.path.normpath(f'Lua/Submodules/{submodule_name}'), 'r')
                             submodule_script = lua_file.read()
                             lua_file.close()
                         except:

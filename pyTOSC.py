@@ -2,7 +2,7 @@ import sys
 import os
 
 full_dir = os.getcwd()
-working_index = full_dir.rfind("\\") + 1
+working_index = full_dir.rfind(os.path.normpath("/")) + 1
 dir = full_dir[working_index:]
 
 is_pyTOSC_folder = dir == "pyTOSC"
@@ -35,7 +35,7 @@ def Clean():
     build_files = os.listdir("Build")
     for file in build_files:
         if file != ".gitignore":
-            os.remove(f'Build\\{file}')
+            os.remove(os.path.normpath(f'Build/{file}'))
     print("Build directory cleaned!")
 
 def CleanLua():
@@ -43,11 +43,11 @@ def CleanLua():
     lua_files = os.listdir("Lua")
     for file in lua_files:
         if file != "Submodules":
-            os.remove(f'Lua\\{file}')
+            os.remove(os.path.normpath(f'Lua/{file}'))
         else:
-            sub_files = os.listdir("Lua\\Submodules")
+            sub_files = os.listdir(os.path.normpath("Lua/Submodules"))
             for sub in sub_files:
-                os.remove(f'Lua\\Submodules\\{sub}')
+                os.remove(os.path.normpath(f'Lua/Submodules/{sub}'))
     print("Lua directory cleaned!")
 
 def Help():
