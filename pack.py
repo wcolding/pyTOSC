@@ -142,13 +142,14 @@ def Pack(xml_name):
                         text_val[3].text = name[1].text
                         text_size_val = child.find(".//*[key='textSize']")
                         text_size_val[1].text = str(text_size)
-                # Update all UUIDs
-                curButton.set('ID', str(uuid.uuid4()))
 
-                for child in children:
-                    child.set('ID', str(uuid.uuid4()))
-            
+                # For all but the first button, update all UUIDs
                 if i > 0:
+                    curButton.set('ID', str(uuid.uuid4()))
+
+                    for child in children:
+                        child.set('ID', str(uuid.uuid4()))
+                        
                     # Append new button
                     xml_iterable_buttons_group.append(curButton)
     
