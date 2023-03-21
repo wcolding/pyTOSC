@@ -218,6 +218,9 @@ def Pack(xml_name):
             
             # Replace string '$BUILD_NAME' with actual build name. This can automate relabeling things
             temp_data = temp_data.replace('$BUILD_NAME', section)
+            
+            # Replace string '$VERSION' with version
+            temp_data = temp_data.replace('$VERSION', f'Version {version}')
 
             build_root = ET.fromstring(temp_data)
             properties = build_config[section].items()
