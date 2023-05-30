@@ -74,21 +74,21 @@ def Pack(xml_name):
     print(f'Total script replacements: {replacements}\n')
 
     # Second pass to duplicate iterable objects
+    layout_config = ConfigParser()
+    layout_config.read('mix_layout.ini')
+
     xml_iterable_buttons_groups = root.findall(".//*[key='iterableButton']......")
 
     if len(xml_iterable_buttons_groups) > 0:
-        layout_config = ConfigParser()
-        layout_config.read('mix_layout.ini')
-
-        grid_start_x = int(layout_config['Default']['GridStartX'])
-        grid_start_y = int(layout_config['Default']['GridStartY'])
-        button_width = int(layout_config['Default']['ButtonWidth'])
-        button_height = int(layout_config['Default']['ButtonHeight'])
-        padding_x = int(layout_config['Default']['PaddingX'])
-        padding_y = int(layout_config['Default']['PaddingY'])
-        auto_channels = int(layout_config['Default']['AutoChannels'])
-        buttons_per_row = int(layout_config['Default']['ButtonsPerRow'])
-        text_size = int(layout_config['Default']['TextSize'])
+        grid_start_x = int(layout_config['Buttons']['GridStartX'])
+        grid_start_y = int(layout_config['Buttons']['GridStartY'])
+        button_width = int(layout_config['Buttons']['ButtonWidth'])
+        button_height = int(layout_config['Buttons']['ButtonHeight'])
+        padding_x = int(layout_config['Buttons']['PaddingX'])
+        padding_y = int(layout_config['Buttons']['PaddingY'])
+        auto_channels = int(layout_config['Buttons']['AutoChannels'])
+        buttons_per_row = int(layout_config['Buttons']['ButtonsPerRow'])
+        text_size = int(layout_config['Buttons']['TextSize'])
 
         for xml_iterable_buttons_group in xml_iterable_buttons_groups:
             xml_iterable_buttons = xml_iterable_buttons_group.findall(".//*[key='iterableButton']....")
@@ -198,6 +198,28 @@ def Pack(xml_name):
                                 pager_children.append(tab_object)
 
                             current_tab_index += 1
+
+    # Iterate cameras
+    xml_iterable_cameras = root.findall(".//*[key='iterableCamera']....")
+
+    if len(xml_iterable_cameras) > 0:
+        cam_config = ConfigParser()
+        cam_config.read('cameras.ini')
+        cams = cam_config.sections()
+        print(f'Cameras defined: {cams}')
+
+        grid_start_x = int(layout_config['Cameras']['GridStartX'])
+        grid_start_y = int(layout_config['Cameras']['GridStartY'])
+        cam_width = int(layout_config['Cameras']['CameraWidth'])
+        cam_height = int(layout_config['Cameras']['CameraHeight'])
+        padding_x = int(layout_config['Cameras']['PaddingX'])
+        padding_y = int(layout_config['Cameras']['PaddingY'])
+        cams_per_row = int(layout_config['Cameras']['CamerasPerRow'])
+
+        # for camera in xml_iterable_cameras:
+        #     for cam in cams:
+
+
 
     main_data = ET.tostring(root, encoding='unicode')
 
