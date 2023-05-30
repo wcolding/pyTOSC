@@ -10,11 +10,13 @@ class IterableObject():
         self.__configparser.read(config_file)
         self.__header = header
 
-    def GetPropertyValue(self, property: str):
-        return self.__configparser[self.__header][property]
+    def GetPropertyValue(self, property: str, header: str = ''):
+        if header == '':
+            header = self.__header
+        return self.__configparser[header][property]
 
-    def GetInt(self, property: str):
-        return int(self.GetPropertyValue(property))
+    def GetInt(self, property: str, header: str = ''):
+        return int(self.GetPropertyValue(property, header))
 
     def Iterate(self, root: ET.Element):
         pass
