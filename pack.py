@@ -76,72 +76,28 @@ def Pack(xml_name):
     print(f'Total script replacements: {replacements}\n')
 
     # Second pass to duplicate iterable objects
-    # Buttons
     iterable_buttons = IObj.IterableButton('mix_layout.ini')
     iterable_buttons.Iterate(root)
-    
-    # Iterate tabs
-    xml_auto_pagers = root.findall(".//*[key='autoPager']....")
-    
-    if len(xml_auto_pagers) > 0:
-        tab_config = ConfigParser()
-        tab_config.read('tabs.ini')
-        tabs = tab_config.sections()
-        print(f'Tabs defined: {tabs}')
 
-        for pager in xml_auto_pagers:
-            pager_id = int(pager.find(".//*[key='autoPager']")[1].text)
-            print(f'Pager id: {pager_id}')
-            pager_children = pager.find(".//children")
-            current_tab_index = 0
-
-            for tab in tabs:
-                if int(tab_config[tab]['Pager']) == pager_id:
-                    tab_object = pager.find(".//children/node")
-                    if tab_object != None:
-                        if current_tab_index > 0:
-                            tab_object = copy.deepcopy(tab_object)
-
-                        tab_name = tab_object.find(".//*[key='name']")
-                        tab_label = tab_object.find(".//*[key='tabLabel']")
-                        tab_name[1].text = tab_config[tab]['Label']
-                        tab_label[1].text = tab_config[tab]['Label']
-
-                        tab_group = tab_object.find(".//children/node")
-                        if tab_group != None:
-                            tab_group_tag = tab_group.find(".//*[key='tag']")
-                            mix_number = int(tab_config[tab]['Index'])
-                            print(f'Creating tab for index {mix_number:02}...')
-                            tab_group_tag[1].text = f'{mix_number:02}'
-                            
-                            if current_tab_index > 0:
-                                # Reassign UUIDs
-                                tab_nodes = tab_object.findall(".//children/node")
-                                if len(tab_nodes) > 0:
-                                    for node in tab_nodes:
-                                        node.set('ID', str(uuid.uuid4()))
-                                
-                                # Add new tab 
-                                pager_children.append(tab_object)
-
-                            current_tab_index += 1
+    auto_pagers = IObj.AutoPager('tabs.ini')
+    auto_pagers.Iterate(root)
 
     # Iterate cameras
-    xml_iterable_cameras = root.findall(".//*[key='iterableCamera']....")
+    # xml_iterable_cameras = root.findall(".//*[key='iterableCamera']....")
 
-    if len(xml_iterable_cameras) > 0:
-        cam_config = ConfigParser()
-        cam_config.read('cameras.ini')
-        cams = cam_config.sections()
-        print(f'Cameras defined: {cams}')
+    # if len(xml_iterable_cameras) > 0:
+    #     cam_config = ConfigParser()
+    #     cam_config.read('cameras.ini')
+    #     cams = cam_config.sections()
+    #     print(f'Cameras defined: {cams}')
 
-        grid_start_x = int(layout_config['Cameras']['GridStartX'])
-        grid_start_y = int(layout_config['Cameras']['GridStartY'])
-        cam_width = int(layout_config['Cameras']['CameraWidth'])
-        cam_height = int(layout_config['Cameras']['CameraHeight'])
-        padding_x = int(layout_config['Cameras']['PaddingX'])
-        padding_y = int(layout_config['Cameras']['PaddingY'])
-        cams_per_row = int(layout_config['Cameras']['CamerasPerRow'])
+    #     grid_start_x = int(layout_config['Cameras']['GridStartX'])
+    #     grid_start_y = int(layout_config['Cameras']['GridStartY'])
+    #     cam_width = int(layout_config['Cameras']['CameraWidth'])
+    #     cam_height = int(layout_config['Cameras']['CameraHeight'])
+    #     padding_x = int(layout_config['Cameras']['PaddingX'])
+    #     padding_y = int(layout_config['Cameras']['PaddingY'])
+    #     cams_per_row = int(layout_config['Cameras']['CamerasPerRow'])
 
         # for camera in xml_iterable_cameras:
         #     for cam in cams:
@@ -154,7 +110,7 @@ def Pack(xml_name):
     build_config = ConfigParser()
     build_config.read('builds.ini')
     sections = build_config.sections()
-    print(f'\nBuild configurations found: {sections}\n')
+    print(f'Build configurations found: {sections}\n')
 
 
     if len(sections) > 0:

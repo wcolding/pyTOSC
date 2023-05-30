@@ -9,6 +9,7 @@ class IterableObject():
         self.__configparser = ConfigParser()
         self.__configparser.read(config_file)
         self.__header = header
+        self.sections = self.__configparser.sections()
 
     def GetPropertyValue(self, property: str, header: str = ''):
         if header == '':
@@ -107,3 +108,55 @@ class IterableButton(IterableObject):
                         
                     # Append new button
                     group.append(curButton)
+
+class AutoPager(IterableObject):
+    def __init__(self, config_file:str):
+        super().__init__(config_file, 'Default')
+        self.tabs = self.sections
+
+    def Iterate(self, root: ET.Element):
+        xml_auto_pagers = root.findall(".//*[key='autoPager']....")
+
+        if len(xml_auto_pagers) < 1:
+            return
+
+        print(f'Tabs defined: {self.tabs}')
+
+        for pager in xml_auto_pagers:
+            pager_id = int(pager.find(".//*[key='autoPager']")[1].text)
+            print(f'Pager id: {pager_id}')
+            pager_children = pager.find(".//children")
+            current_tab_index = 0
+
+            for tab in self.tabs:
+                if self.GetInt('Pager', tab) == pager_id:
+                    tab_object = pager.find(".//children/node")
+                    if tab_object != None:
+                        if current_tab_index > 0:
+                            tab_object = copy.deepcopy(tab_object)
+
+                        tab_name = tab_object.find(".//*[key='name']")
+                        tab_label = tab_object.find(".//*[key='tabLabel']")
+                        tab_name[1].text = self.GetPropertyValue('Label', tab)
+                        tab_label[1].text = self.GetPropertyValue('Label', tab)
+
+                        tab_group = tab_object.find(".//children/node")
+                        if tab_group != None:
+                            tab_group_tag = tab_group.find(".//*[key='tag']")
+                            mix_number = self.GetInt('Index', tab)
+                            print(f'Creating tab for index {mix_number:02}...')
+                            tab_group_tag[1].text = f'{mix_number:02}'
+                            
+                            if current_tab_index > 0:
+                                # Reassign UUIDs
+                                tab_nodes = tab_object.findall(".//children/node")
+                                if len(tab_nodes) > 0:
+                                    for node in tab_nodes:
+                                        node.set('ID', str(uuid.uuid4()))
+                                
+                                # Add new tab 
+                                pager_children.append(tab_object)
+
+                            current_tab_index += 1
+
+            print()
