@@ -1,6 +1,8 @@
 import io
 import os
 import zlib
+import pyTOSC.IterableObject as IObj
+
 from configparser import ConfigParser
 import xml.etree.ElementTree as ET
 import copy
@@ -74,84 +76,9 @@ def Pack(xml_name):
     print(f'Total script replacements: {replacements}\n')
 
     # Second pass to duplicate iterable objects
-    layout_config = ConfigParser()
-    layout_config.read('mix_layout.ini')
-
-    xml_iterable_buttons_groups = root.findall(".//*[key='iterableButton']......")
-
-    if len(xml_iterable_buttons_groups) > 0:
-        grid_start_x = int(layout_config['Buttons']['GridStartX'])
-        grid_start_y = int(layout_config['Buttons']['GridStartY'])
-        button_width = int(layout_config['Buttons']['ButtonWidth'])
-        button_height = int(layout_config['Buttons']['ButtonHeight'])
-        padding_x = int(layout_config['Buttons']['PaddingX'])
-        padding_y = int(layout_config['Buttons']['PaddingY'])
-        auto_channels = int(layout_config['Buttons']['AutoChannels'])
-        buttons_per_row = int(layout_config['Buttons']['ButtonsPerRow'])
-        text_size = int(layout_config['Buttons']['TextSize'])
-
-        for xml_iterable_buttons_group in xml_iterable_buttons_groups:
-            xml_iterable_buttons = xml_iterable_buttons_group.findall(".//*[key='iterableButton']....")
-        
-            for i in range(auto_channels):
-                if i == 0:
-                    curButton = xml_iterable_buttons[0]
-                else:
-                    curButton = copy.deepcopy(xml_iterable_buttons[0])
-                
-                children = curButton.findall(".//node")
-
-                name = curButton.find(".//*[key='name']")
-                tag = curButton.find(".//*[key='tag']")
-                iterable = curButton.find(".//*[key='iterableButton']")
-                frame = curButton.find(".//*[key='frame']")
-                name[1].text = f'Ch{i+1:02}'
-                tag[1].text = f'{i+1:02}'
-                if i > 0:
-                    iterable[1].text = '0'
-
-                if i == 0:
-                    # Resize button
-                    frame[1][2].text = str(button_width)
-                    frame[1][3].text = str(button_height)
-
-                    # Position button
-                    frame[1][0].text = str(grid_start_x)
-                    frame[1][1].text = str(grid_start_y)
-
-                    # Operate on children (button and label)
-                    for child in children:
-                        child_frame = child.find(".//*[key='frame']")
-                        child_frame[1][2].text = str(button_width)
-                        child_frame[1][3].text = str(button_height)
-                else:
-                    # Reposition duplicate buttons
-                    row = math.floor(i / buttons_per_row)
-                    column = i % buttons_per_row
-
-                    new_x = grid_start_x + ((button_width + padding_x) * column)
-                    new_y = grid_start_y + ((button_height + padding_y) * row)
-
-                    frame[1][0].text = str(new_x)
-                    frame[1][1].text = str(new_y)
-
-                # Write default names for button labels and set text size
-                for child in children:
-                    if child.get('type') == 'LABEL':
-                        text_val = child.find(".//*[key='text']")
-                        text_val[3].text = name[1].text
-                        text_size_val = child.find(".//*[key='textSize']")
-                        text_size_val[1].text = str(text_size)
-
-                # For all but the first button, update all UUIDs
-                if i > 0:
-                    curButton.set('ID', str(uuid.uuid4()))
-
-                    for child in children:
-                        child.set('ID', str(uuid.uuid4()))
-                        
-                    # Append new button
-                    xml_iterable_buttons_group.append(curButton)
+    # Buttons
+    iterable_buttons = IObj.IterableButton('mix_layout.ini')
+    iterable_buttons.Iterate(root)
     
     # Iterate tabs
     xml_auto_pagers = root.findall(".//*[key='autoPager']....")

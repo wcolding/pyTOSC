@@ -5,16 +5,16 @@ import uuid
 import math
 
 class IterableObject():
-    def __init__(self, config_file: str):
+    def __init__(self, config_file: str, header: str):
         self.__configparser = ConfigParser()
         self.__configparser.read(config_file)
-        self.__header = ""
+        self.__header = header
 
     def GetPropertyValue(self, property: str):
         return self.__configparser[self.__header][property]
 
     def GetInt(self, property: str):
-        return int(self.GetPropertyValue(self.__header, property))
+        return int(self.GetPropertyValue(property))
 
     def Iterate(self, root: ET.Element):
         pass
@@ -22,8 +22,7 @@ class IterableObject():
 
 class IterableButton(IterableObject):
     def __init__(self, config_file:str):
-        super.__init__(self, config_file)
-        self.__header = 'Buttons'
+        super().__init__(config_file, 'Default')
         
         self.grid_start_x = self.GetInt('GridStartX')
         self.grid_start_y = self.GetInt('GridStartY')
