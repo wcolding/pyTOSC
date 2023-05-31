@@ -76,7 +76,7 @@ def Pack(xml_name):
     print(f'Total script replacements: {replacements}\n')
 
     # Second pass to duplicate iterable objects
-    iterable_buttons = IObj.IterableButton('mix_layout.ini')
+    iterable_buttons = IObj.IterableButton('mix_layout.ini', 'channels.ini')
     iterable_buttons.Iterate(root)
 
     auto_pagers = IObj.AutoPager('tabs.ini')
