@@ -82,25 +82,8 @@ def Pack(xml_name):
     auto_pagers = IObj.AutoPager('tabs.ini')
     auto_pagers.Iterate(root)
 
-    # Iterate cameras
-    # xml_iterable_cameras = root.findall(".//*[key='iterableCamera']....")
-
-    # if len(xml_iterable_cameras) > 0:
-    #     cam_config = ConfigParser()
-    #     cam_config.read('cameras.ini')
-    #     cams = cam_config.sections()
-    #     print(f'Cameras defined: {cams}')
-
-    #     grid_start_x = int(layout_config['Cameras']['GridStartX'])
-    #     grid_start_y = int(layout_config['Cameras']['GridStartY'])
-    #     cam_width = int(layout_config['Cameras']['CameraWidth'])
-    #     cam_height = int(layout_config['Cameras']['CameraHeight'])
-    #     padding_x = int(layout_config['Cameras']['PaddingX'])
-    #     padding_y = int(layout_config['Cameras']['PaddingY'])
-    #     cams_per_row = int(layout_config['Cameras']['CamerasPerRow'])
-
-        # for camera in xml_iterable_cameras:
-        #     for cam in cams:
+    iterable_cameras = IObj.IterableCamera('mix_layout.ini', 'cameras.ini')
+    iterable_cameras.Iterate(root)
 
 
 
