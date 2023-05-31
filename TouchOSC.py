@@ -32,3 +32,10 @@ def SetColor(element: ET.Element, color: tuple):
 def SetTextValue(element: ET.Element, value: str):
     text_element = element.find(".//*[key='text']")
     text_element[3].text = value
+
+def SetRect(element: ET.Element, rect_name: str, x: int, y: int, w: int, h: int):
+    rect = element.find(f".//*[key='{rect_name}']")
+    rect[1][0].text = str(x)
+    rect[1][1].text = str(y)
+    rect[1][2].text = str(w)
+    rect[1][3].text = str(h)

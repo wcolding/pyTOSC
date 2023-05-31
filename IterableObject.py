@@ -226,27 +226,11 @@ class IterableCamera(IterableObject):
                 SetColor(cam_label_obj, main_color_tuple)
                 SetTextValue(cam_label_obj, self.cameras[i])
 
-                if i == 0:
-                    # Resize camera
-                    xml_frame[1][2].text = str(self.cam_width)
-                    xml_frame[1][3].text = str(self.cam_height)
-
-                    # Position camera
-                    xml_frame[1][0].text = str(self.grid_start_x)
-                    xml_frame[1][1].text = str(self.grid_start_y)
-
-                    # Operate on children (button and label)
-                    # todo
-                else:
-                    # Reposition duplicate cameras
-                    row = math.floor(i / self.cams_per_row)
-                    column = i % self.cams_per_row
-
-                    new_x = self.grid_start_x + ((self.cam_width + self.padding_x) * column)
-                    new_y = self.grid_start_y + ((self.cam_height + self.padding_y) * row)
-
-                    xml_frame[1][0].text = str(new_x)
-                    xml_frame[1][1].text = str(new_y)
+                row = math.floor(i / self.cams_per_row)
+                column = i % self.cams_per_row
+                start_x = self.grid_start_x + ((self.cam_width + self.padding_x) * column)
+                start_y = self.grid_start_y + ((self.cam_height + self.padding_y) * row)
+                SetRect(cur_cam, 'frame', start_x, start_y, self.cam_width, self.cam_height)
 
                 # For all but the first button, update all UUIDs
                 if i > 0:
