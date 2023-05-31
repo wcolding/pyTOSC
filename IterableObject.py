@@ -1,7 +1,5 @@
 from configparser import ConfigParser
-import xml.etree.ElementTree as ET
 import copy
-import uuid
 import math
 from pyTOSC.TouchOSC import *
 
@@ -102,10 +100,7 @@ class IterableButton(IterableObject):
 
                 # For all but the first button, update all UUIDs
                 if i > 0:
-                    curButton.set('ID', str(uuid.uuid4()))
-
-                    for child in children:
-                        child.set('ID', str(uuid.uuid4()))
+                    SetNewUUIDs(curButton)
                         
                     # Append new button
                     group.append(curButton)
@@ -195,11 +190,7 @@ class IterableCamera(IterableObject):
                     cur_cam = xml_iterable_cameras[0]
                 else:
                     cur_cam = copy.deepcopy(xml_iterable_cameras[0])
-
-                children = cur_cam.findall(".//node")
-                
-                xml_frame = cur_cam.find(".//*[key='frame']")                
-
+    
                 bus = self.__cam_config.GetInt('Bus', self.cameras[i])
                 SetAttribute(cur_cam, 'mixbus', str(bus))
                 SetAttribute(cur_cam, 'tag', f'{bus:02}')
@@ -234,10 +225,7 @@ class IterableCamera(IterableObject):
 
                 # For all but the first button, update all UUIDs
                 if i > 0:
-                    cur_cam.set('ID', str(uuid.uuid4()))
-
-                    for child in children:
-                        child.set('ID', str(uuid.uuid4()))
+                    SetNewUUIDs(cur_cam)
                         
                     # Append new button
                     group.append(cur_cam)

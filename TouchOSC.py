@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import uuid
 
 def HexToColorTuple(hex_string: str):
     if len(hex_string) < 8:
@@ -39,3 +40,10 @@ def SetRect(element: ET.Element, rect_name: str, x: int, y: int, w: int, h: int)
     rect[1][1].text = str(y)
     rect[1][2].text = str(w)
     rect[1][3].text = str(h)
+
+def SetNewUUIDs(element: ET.Element):
+    element.set('ID', str(uuid.uuid4()))
+
+    children = element.findall(".//node")     
+    for child in children:
+        child.set('ID', str(uuid.uuid4()))
