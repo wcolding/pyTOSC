@@ -50,16 +50,16 @@ class IterableButton(IterableObject):
         
             for i in range(self.auto_channels):
                 if i == 0:
-                    curButton = xml_iterable_buttons[0]
+                    cur_button = xml_iterable_buttons[0]
                 else:
-                    curButton = copy.deepcopy(xml_iterable_buttons[0])
+                    cur_button = copy.deepcopy(xml_iterable_buttons[0])
                 
-                children = curButton.findall(".//node")
+                children = cur_button.findall(".//node")
 
-                name = curButton.find(".//*[key='name']")
-                tag = curButton.find(".//*[key='tag']")
-                iterable = curButton.find(".//*[key='iterableButton']")
-                frame = curButton.find(".//*[key='frame']")
+                name = cur_button.find(".//*[key='name']")
+                tag = cur_button.find(".//*[key='tag']")
+                iterable = cur_button.find(".//*[key='iterableButton']")
+                frame = cur_button.find(".//*[key='frame']")
                 name[1].text = f'Ch{i+1:02}'
                 tag[1].text = f'{i+1:02}'
                 if i > 0:
@@ -100,10 +100,10 @@ class IterableButton(IterableObject):
 
                 # For all but the first button, update all UUIDs
                 if i > 0:
-                    SetNewUUIDs(curButton)
+                    SetNewUUIDs(cur_button)
                         
                     # Append new button
-                    group.append(curButton)
+                    group.append(cur_button)
 
 class AutoPager(IterableObject):
     def __init__(self, config_file:str):
