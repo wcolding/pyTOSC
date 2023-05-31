@@ -1,5 +1,10 @@
 import xml.etree.ElementTree as ET
 import uuid
+from enum import Enum
+
+class ObjType(Enum):
+    LABEL = 0
+
 
 def HexToColorTuple(hex_string: str):
     if len(hex_string) < 8:
@@ -20,6 +25,13 @@ def GetChildByName(element: ET.Element, name: str):
     for child in children:
         name_attribute = child.find(".//*[key='name']")
         if name_attribute[1].text == name:
+            return child
+
+def GetChildByType(element: ET.Element, type: ObjType):
+    children = element.findall(".//node")
+
+    for child in children:
+        if child.get('type') == type.name:
             return child
 
 def SetColor(element: ET.Element, color: tuple):

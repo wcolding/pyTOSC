@@ -56,47 +56,32 @@ class IterableButton(IterableObject):
                 
                 children = cur_button.findall(".//node")
 
-                name = cur_button.find(".//*[key='name']")
-                tag = cur_button.find(".//*[key='tag']")
-                iterable = cur_button.find(".//*[key='iterableButton']")
-                frame = cur_button.find(".//*[key='frame']")
-                name[1].text = f'Ch{i+1:02}'
-                tag[1].text = f'{i+1:02}'
+
+                SetAttribute(cur_button, 'name', f'Ch{i+1:02}')
+                SetAttribute(cur_button, 'text', f'{i+1:02}')
+
                 if i > 0:
-                    iterable[1].text = '0'
+                    SetAttribute(cur_button, 'iterableButton', str(0))
 
-                if i == 0:
-                    # Resize button
-                    frame[1][2].text = str(self.button_width)
-                    frame[1][3].text = str(self.button_height)
+                label_obj = GetChildByType(cur_button, ObjType.LABEL)
 
-                    # Position button
-                    frame[1][0].text = str(self.grid_start_x)
-                    frame[1][1].text = str(self.grid_start_y)
-
-                    # Operate on children (button and label)
-                    for child in children:
-                        child_frame = child.find(".//*[key='frame']")
-                        child_frame[1][2].text = str(self.button_width)
-                        child_frame[1][3].text = str(self.button_height)
-                else:
-                    # Reposition duplicate buttons
+                if self.auto_channels > 0:
                     row = math.floor(i / self.buttons_per_row)
                     column = i % self.buttons_per_row
-
-                    new_x = self.grid_start_x + ((self.button_width + self.padding_x) * column)
-                    new_y = self.grid_start_y + ((self.button_height + self.padding_y) * row)
-
-                    frame[1][0].text = str(new_x)
-                    frame[1][1].text = str(new_y)
-
-                # Write default names for button labels and set text size
+                    start_x = self.grid_start_x + ((self.button_width + self.padding_x) * column)
+                    start_y = self.grid_start_y + ((self.button_height + self.padding_y) * row)
+                    SetRect(cur_button, 'frame', start_x, start_y, self.button_width, self.button_height)
+                    
+                    SetTextValue(label_obj, f'Ch{i+1:02}')
+                    SetAttribute(label_obj, 'textSize', str(self.text_size))
+                else:
+                    # Set manually according to config
+                    # todo
+                    pass
+                
+                # Scale child objects
                 for child in children:
-                    if child.get('type') == 'LABEL':
-                        text_val = child.find(".//*[key='text']")
-                        text_val[3].text = name[1].text
-                        text_size_val = child.find(".//*[key='textSize']")
-                        text_size_val[1].text = str(self.text_size)
+                        SetRect(child, 'frame', 0, 0, self.button_width, self.button_height)
 
                 # For all but the first button, update all UUIDs
                 if i > 0:
