@@ -73,8 +73,11 @@ class IterableButton(IterableObject):
 
                 label_obj = GetChildByType(cur_button, ObjType.LABEL)
                 SetProperty(label_obj, 'textSize', str(self.text_size))
-
+                
                 if self.auto_channels > 0:
+                    # Tag
+                    SetProperty(cur_button, 'tag', f'{i+1:02}')
+
                     # Frame
                     row = math.floor(i / self.buttons_per_row)
                     column = i % self.buttons_per_row
@@ -86,6 +89,10 @@ class IterableButton(IterableObject):
                     SetTextValue(label_obj, f'Ch{i+1:02}')
                 else:
                     # Set manually according to config
+
+                    # Tag
+                    channel = self.__channel_config.GetInt('X32Channel', self.channels[i])
+                    SetProperty(cur_button, 'tag', f'{channel:02}')
 
                     # Frame
                     start_x = self.__channel_config.GetPropertyValue('X', self.channels[i])
@@ -104,6 +111,16 @@ class IterableButton(IterableObject):
                     
                     button_obj = GetChildByName(cur_button, 'ChannelButton')
                     SetColor(button_obj, color_tuple)
+
+                    # Midi
+                    midi_channel = self.__channel_config.GetInt('MidiChannel', self.channels[i])
+                    midi_controller = self.__channel_config.GetInt('MidiController', self.channels[i])
+                    SetProperty(cur_button, 'midiChannel', str(midi_channel))
+                    SetProperty(cur_button, 'midiController', str(midi_controller))
+
+                    fader_obj = GetChildByName(cur_button, 'ChannelTrim')
+                    SetMidiCC(fader_obj, midi_channel, midi_controller)
+
                     
                 
                 # Scale child objects
@@ -205,18 +222,18 @@ class IterableCamera(IterableObject):
                     cur_cam = copy.deepcopy(xml_iterable_cameras[0])
     
                 bus = self.__cam_config.GetInt('Bus', self.cameras[i])
-                SetAttribute(cur_cam, 'mixbus', str(bus))
-                SetAttribute(cur_cam, 'tag', f'{bus:02}')
+                SetProperty(cur_cam, 'mixbus', str(bus))
+                SetProperty(cur_cam, 'tag', f'{bus:02}')
 
                 if i > 0:
-                    SetAttribute(cur_cam, 'iterableCamera', str(0))
+                    SetProperty(cur_cam, 'iterableCamera', str(0))
                 
                 main_color = self.__cam_config.GetPropertyValue('MainColor', self.cameras[i])
                 bg_color = self.__cam_config.GetPropertyValue('BGColor', self.cameras[i])
 
-                SetAttribute(cur_cam, 'cameraName', self.cameras[i])
-                SetAttribute(cur_cam, 'mainColor', main_color)
-                SetAttribute(cur_cam, 'bgColor', bg_color)
+                SetProperty(cur_cam, 'cameraName', self.cameras[i])
+                SetProperty(cur_cam, 'mainColor', main_color)
+                SetProperty(cur_cam, 'bgColor', bg_color)
 
                 main_color_tuple = HexToColorTuple(main_color)
                 bg_color_tuple = HexToColorTuple(bg_color)

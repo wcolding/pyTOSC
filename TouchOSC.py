@@ -20,6 +20,11 @@ def SetProperty(element: ET.Element, name: str, value: str):
     property = element.find(f".//*[key='{name}']")
     property[1].text = value
 
+def SetMidiCC(element: ET.Element, channel: int, controller: int):
+    midi_msg = element.find(".//*[type='CONTROLCHANGE']")
+    midi_msg[1].text = str(channel - 1)
+    midi_msg[2].text = str(controller)
+
 def GetChildByName(element: ET.Element, name: str):
     children = element.findall(".//node")
     for child in children:
