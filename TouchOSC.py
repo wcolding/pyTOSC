@@ -16,9 +16,9 @@ def HexToColorTuple(hex_string: str):
     a = int(hex_string[6:8], 16) / 255
     return (r,g,b,a)
 
-def SetAttribute(element: ET.Element, name: str, value: str):
-    attribute = element.find(f".//*[key='{name}']")
-    attribute[1].text = value
+def SetProperty(element: ET.Element, name: str, value: str):
+    property = element.find(f".//*[key='{name}']")
+    property[1].text = value
 
 def GetChildByName(element: ET.Element, name: str):
     children = element.findall(".//node")

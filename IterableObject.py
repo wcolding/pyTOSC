@@ -66,14 +66,13 @@ class IterableButton(IterableObject):
                 else:
                     cur_button = copy.deepcopy(xml_iterable_buttons[0])
 
-                SetAttribute(cur_button, 'name', f'Ch{i+1:02}')
-                SetAttribute(cur_button, 'text', f'{i+1:02}')
+                SetProperty(cur_button, 'name', f'Ch{i+1:02}')
 
                 if i > 0:
-                    SetAttribute(cur_button, 'iterableButton', str(0))
+                    SetProperty(cur_button, 'iterableButton', str(0))
 
                 label_obj = GetChildByType(cur_button, ObjType.LABEL)
-                SetAttribute(label_obj, 'textSize', str(self.text_size))
+                SetProperty(label_obj, 'textSize', str(self.text_size))
 
                 if self.auto_channels > 0:
                     # Frame
