@@ -13,10 +13,13 @@ class IterableObject():
     def GetPropertyValue(self, property: str, header: str = ''):
         if header == '':
             header = self.__header
-        return self.__configparser[header][property]
+        return self.__configparser.get(header, property, fallback=None)
 
     def GetInt(self, property: str, header: str = ''):
-        return int(self.GetPropertyValue(property, header))
+        value = self.GetPropertyValue(property, header)
+        if value != None:
+            return int(value)
+        return 0
 
     def Iterate(self, root: ET.Element):
         pass
