@@ -95,9 +95,12 @@ class IterableButton(IterableObject):
                     SetProperty(cur_button, 'tag', f'{channel:02}')
 
                     # Frame
-                    start_x = self.__channel_config.GetPropertyValue('X', self.channels[i])
-                    start_y = self.__channel_config.GetPropertyValue('Y', self.channels[i])
-                    SetRect(cur_button, 'frame', start_x, start_y, self.button_width, self.button_height)
+                    position = self.__channel_config.GetPropertyValue('Position', self.channels[i])
+                    if position:
+                        x, y = position.split(',')
+                        start_x = int(x)
+                        start_y = int(y)
+                        SetRect(cur_button, 'frame', start_x, start_y, self.button_width, self.button_height)
 
                     # Label
                     SetTextValue(label_obj, self.channels[i])
