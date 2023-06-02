@@ -11,15 +11,15 @@ class IterableObject():
         self.sections = self.__configparser.sections()
 
     def GetPropertyValue(self, property: str, header: str = ''):
-        if header == '':
-            header = self.__header
+        header = header or self.__header
         return self.__configparser.get(header, property, fallback=None)
 
     def GetInt(self, property: str, header: str = ''):
         value = self.GetPropertyValue(property, header)
-        if value != None:
+        try:
             return int(value)
-        return 0
+        except(TypeError, ValueError):
+            return 0
 
     def Iterate(self, root: ET.Element):
         pass
@@ -73,7 +73,7 @@ class IterableButton(IterableObject):
 
                 label_obj = GetChildByType(cur_button, ObjType.LABEL)
                 SetProperty(label_obj, 'textSize', str(self.text_size))
-                
+
                 if self.auto_channels > 0:
                     # Tag
                     SetProperty(cur_button, 'tag', f'{i+1:02}')
