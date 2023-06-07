@@ -228,6 +228,8 @@ class IterableCamera(IterableObject):
                 SetProperty(cur_cam, 'mixbus', str(bus))
                 SetProperty(cur_cam, 'tag', f'{bus:02}')
 
+                SetProperty(cur_cam, 'mixIndex', str(i+1))
+
                 if i > 0:
                     SetProperty(cur_cam, 'iterableCamera', str(0))
                 
