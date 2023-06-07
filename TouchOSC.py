@@ -5,6 +5,10 @@ from enum import Enum
 class ObjType(Enum):
     LABEL = 0
 
+class IterableType(Enum):
+    iterableButton = 0,
+    autoPager = 1,
+    iterableCamera = 2
 
 def HexToColorTuple(hex_string: str):
     if len(hex_string) < 8:

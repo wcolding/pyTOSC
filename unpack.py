@@ -1,7 +1,7 @@
 import io
 import zlib
 import xml.etree.ElementTree as ET
-import sys
+from pyTOSC.TouchOSC import *
 
 class TOSCName:
     text = ''
@@ -91,6 +91,23 @@ def GetRecursiveObjects(element: ET.Element, level = 0):
 
     return objs_list
 
+def ReduceIterables(xml : ET.Element, iterableType: IterableType):
+    xml_groups = xml.findall(f".//*[key='{iterableType.name}']......")
+    for xml_group in xml_groups:
+        repeated = []
+        xml_iterables = xml_group.findall(f".//*[key='{iterableType.name}']....")
+
+        for xml_iterable in xml_iterables:
+            iterable = xml_iterable.find(f".//*[key='{iterableType.name}']")
+            if iterable[1].text == '0':
+                repeated.append(xml_iterable)
+
+        print(f"{len(repeated)} elements of type {iterableType.name} found. Reducing...", end="")
+
+        for item in repeated:
+            xml_group.remove(item)
+        print("done!")
+
 def Unpack(file_name):
     print(f"Unpacking file {file_name}...")
     file = io.open(file_name, 'rb')
@@ -113,23 +130,9 @@ def Unpack(file_name):
         if p[0].text == 'projectName':
             outputFile = f'{p[1].text}.xml'
 
-    # Reduce iterableButtons to minimum for clean XML / easier version control
-    xml_iterable_buttons_groups = prettyXML.findall(".//*[key='iterableButton']......")
-    for xml_iterable_buttons_group in xml_iterable_buttons_groups:
-        repeated_buttons = []
-        xml_iterable_buttons = xml_iterable_buttons_group.findall(".//*[key='iterableButton']....")
-
-        for button in xml_iterable_buttons:
-            iterable = button.find(".//*[key='iterableButton']")
-            if iterable[1].text == '0':
-                repeated_buttons.append(button)
-    
-        print(len(repeated_buttons))
-        for button in repeated_buttons:
-            xml_iterable_buttons_group.remove(button)
-    
-    # Reduce autoPagers
-    # todo
+    ReduceIterables(prettyXML, IterableType.iterableCamera)
+    #ReduceIterables(prettyXML, IterableType.autoPager)   --need to test this
+    ReduceIterables(prettyXML, IterableType.iterableButton)
 
     ET.indent(prettyXML)
 
