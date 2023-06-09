@@ -9,6 +9,14 @@ import copy
 import uuid
 import math
 
+def VerifyConfig(config_name: str):    
+    try:
+        config = io.open(config_name,'r')
+        config.close()
+        return True
+    except:
+        return False
+
 def Pack(xml_name):
     file = io.open('version', 'r')
     version = file.read()
@@ -30,6 +38,15 @@ def Pack(xml_name):
 
     root = ET.fromstring(data)
     xml_properties = root.findall(".//property")
+
+    # Load config files
+    main_config = ConfigParser()
+    main_config.read('config.ini')
+    build_config_name = main_config.get('Configs', 'Builds', fallback='')
+    layout_config_name = main_config.get('Configs', 'Layout', fallback='')
+    channels_config_name = main_config.get('Configs', 'Channels', fallback='')
+    tabs_config_name = main_config.get('Configs', 'Tabs', fallback='')
+    cameras_config_name = main_config.get('Configs', 'Cameras', fallback='')
 
     # First pass to replace scripts
     for p in xml_properties:
@@ -76,42 +93,54 @@ def Pack(xml_name):
     print(f'Total script replacements: {replacements}\n')
 
     # Second pass to duplicate iterable objects
-    iterable_buttons = IObj.IterableButton('mix_layout.ini', 'channels.ini')
-    iterable_buttons.Iterate(root)
+    valid_layout = VerifyConfig(layout_config_name)
 
-    auto_pagers = IObj.AutoPager('tabs.ini')
-    auto_pagers.Iterate(root)
+    if valid_layout and VerifyConfig(channels_config_name):
+        print(f'Button config found: {channels_config_name}')
+        iterable_buttons = IObj.IterableButton(layout_config_name, channels_config_name)
+        iterable_buttons.Iterate(root)
 
-    iterable_cameras = IObj.IterableCamera('mix_layout.ini', 'cameras.ini')
-    iterable_cameras.Iterate(root)
+    if VerifyConfig(tabs_config_name):
+        print(f'Tabs config found: {tabs_config_name}')
+        auto_pagers = IObj.AutoPager(tabs_config_name)
+        auto_pagers.Iterate(root)
 
-
+    if valid_layout and VerifyConfig(cameras_config_name):
+        print(f'Camera config found: {cameras_config_name}')
+        iterable_cameras = IObj.IterableCamera(layout_config_name, cameras_config_name)
+        iterable_cameras.Iterate(root)
 
     main_data = ET.tostring(root, encoding='unicode')
 
     # Build specific changes
-    build_config = ConfigParser()
-    build_config.read('builds.ini')
-    sections = build_config.sections()
-    print(f'Build configurations found: {sections}\n')
+    builds = []
+
+    if VerifyConfig(build_config_name):
+        build_config = ConfigParser()
+        build_config.read('builds.ini')
+        builds = build_config.sections()
+        print(f'Build configurations found: {builds}\n')
+    else:
+        print('No valid build config specified\n')
+    
 
 
-    if len(sections) > 0:
+    if len(builds) > 0:
         build_index = 0
-        for section in sections:
-            build_name = f'Build/{xml_name[0:-4]} ({section}) {version}.tosc'
+        for build in builds:
+            build_name = f'Build/{xml_name[0:-4]} ({build}) {version}.tosc'
             temp_data = main_data
 
-            print(section)
+            print(build)
             
             # Replace string '$BUILD_NAME' with actual build name. This can automate relabeling things
-            temp_data = temp_data.replace('$BUILD_NAME', section)
+            temp_data = temp_data.replace('$BUILD_NAME', build)
             
             # Replace string '$VERSION' with version
             temp_data = temp_data.replace('$VERSION', f'Version {version}')
 
             build_root = ET.fromstring(temp_data)
-            properties = build_config[section].items()
+            properties = build_config[build].items()
             for property in properties: 
                 xml_properties = build_root.findall(".//property")
                 for p in xml_properties:
