@@ -62,6 +62,13 @@ def SetRect(element: ET.Element, rect_name: str, x: int, y: int, w: int, h: int)
     rect[1][2].text = str(w)
     rect[1][3].text = str(h)
 
+def GetRect(element: ET.Element, rect_name: str):
+    rect = element.find(f".//*[key='{rect_name}']")
+    return (rect[1][0].text, rect[1][1].text, rect[1][2].text, rect[1][3].text)
+
+def GetFrame(element: ET.Element):
+    return GetRect(element, 'frame')
+
 def SetNewUUIDs(element: ET.Element):
     element.set('ID', str(uuid.uuid4()))
 

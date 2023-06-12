@@ -247,6 +247,13 @@ class IterableCamera(IterableObject):
                 cam_color_obj = GetChildByName(cur_cam, 'CameraColor')
                 cam_label_obj = GetChildByName(cur_cam, 'CameraLabel')
 
+                cam_clear_obj = GetChildByName(cur_cam, 'CameraClear')
+                cam_tone_obj = GetChildByName(cur_cam, 'CameraTone')
+
+                mix_group_obj = GetChildByName(cur_cam, 'MixGroupSelect')
+                mute_obj = GetChildByName(cur_cam, 'Mute')
+                solo_obj = GetChildByName(cur_cam, 'Solo')
+
                 SetColor(cam_bg_obj, bg_color_tuple)
                 SetColor(cam_color_obj, main_color_tuple)
                 SetColor(cam_label_obj, main_color_tuple)
@@ -257,6 +264,20 @@ class IterableCamera(IterableObject):
                 start_x = self.grid_start_x + ((self.cam_width + self.padding_x) * column)
                 start_y = self.grid_start_y + ((self.cam_height + self.padding_y) * row)
                 SetRect(cur_cam, 'frame', start_x, start_y, self.cam_width, self.cam_height)
+
+                # Scale child objects
+                SetRect(cam_bg_obj, 'frame', 0, 0, self.cam_width, self.cam_height)
+                SetRect(cam_clear_obj, 'frame', 0, 0, self.cam_width, self.cam_height)
+                SetRect(cam_tone_obj, 'frame', 0, 0, self.cam_width, self.cam_height)
+
+                mix_group_frame = GetFrame(mix_group_obj)
+                SetRect(mix_group_obj, 'frame', mix_group_frame[0], self.cam_height - 48, mix_group_frame[2], mix_group_frame[3])
+
+                mute_frame = GetFrame(mute_obj)
+                SetRect(mute_obj, 'frame', mute_frame[0], self.cam_height - 48, mute_frame[2], mute_frame[3])
+
+                solo_frame = GetFrame(solo_obj)
+                SetRect(solo_obj, 'frame', solo_frame[0], self.cam_height - 58, solo_frame[2], solo_frame[3])
 
                 # For all but the first button, update all UUIDs
                 if i > 0:
