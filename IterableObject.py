@@ -254,6 +254,10 @@ class IterableCamera(IterableObject):
                 mute_obj = GetChildByName(cur_cam, 'Mute')
                 solo_obj = GetChildByName(cur_cam, 'Solo')
 
+                cam_select_obj = GetChildByName(cur_cam, 'CameraSelect')
+                cam_select_label_obj = GetChildByName(cam_select_obj, 'CameraLabel')
+                cam_select_obj_children = cam_select_obj.find('children')
+
                 SetColor(cam_bg_obj, bg_color_tuple)
                 SetColor(cam_color_obj, main_color_tuple)
                 SetColor(cam_label_obj, main_color_tuple)
@@ -279,9 +283,33 @@ class IterableCamera(IterableObject):
                 solo_frame = GetFrame(solo_obj)
                 SetRect(solo_obj, 'frame', solo_frame[0], self.cam_height - 58, solo_frame[2], solo_frame[3])
 
-                # For all but the first button, update all UUIDs
+                # Set camera dropdown values
+                for dd in range(len(self.cameras)):
+                    if dd == 0:
+                        cur_dd = cam_select_label_obj
+                    else:
+                        cur_dd = copy.deepcopy(cam_select_label_obj)
+                    
+                    dd_color = self.__cam_config.GetPropertyValue('MainColor', self.cameras[dd])
+                    dd_color_tuple = HexToColorTuple(dd_color)
+                    dd_label = self.cameras[dd]
+
+                    dd_color_obj = GetChildByName(cur_dd, 'Color')
+                    dd_label_obj = GetChildByName(cur_dd, 'Label')
+                    SetColor(dd_color_obj, dd_color_tuple)
+                    SetTextValue(dd_label_obj, dd_label)
+
+                    if dd > 0:
+                        dd_frame = GetFrame(cur_dd)
+                        SetRect(cur_dd, 'frame', dd_frame[0], int(dd_frame[1]) + (dd * 26), dd_frame[2], dd_frame[3])
+                        SetNewUUIDs(cur_dd)
+
+                        cam_select_obj_children.insert(-1, cur_dd) # Second to last
+
+
+                # For all but the first camera, update all UUIDs
                 if i > 0:
                     SetNewUUIDs(cur_cam)
                         
-                    # Append new button
+                    # Append new camera
                     group.append(cur_cam)
