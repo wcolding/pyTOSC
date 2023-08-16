@@ -47,14 +47,14 @@ gitignore_file.close()
 print("Success!")
 
 print("Copying config files...")
-print("  (1/4) Builds")
-shutil.copy("builds.ini", os.path.normpath("../builds.ini"))
-print("  (2/4) Mix Layout")
-shutil.copy("tabs.ini", os.path.normpath("../tabs.ini"))
-print("  (3/4) Tabs")
-shutil.copy("mix_layout.ini", os.path.normpath("../mix_layout.ini"))
-print("  (4/4) Config")
-shutil.copy("config.ini", os.path.normpath("../config.ini"))
+files = os.listdir()
+for file in files:
+    if str.lower(file[-4:]) == ".ini":
+        print("Found config: {0}".format(file))
+        print("Copying...", end='')
+        shutil.copy(file, os.path.normpath("../{0}".format(file)))
+        print("done!")
+        
 print("Success!")
 
 print("Copying main script...")
