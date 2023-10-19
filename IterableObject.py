@@ -61,7 +61,6 @@ class IterableButton(IterableObject):
         self.buttons_per_row = self.GetInt('ButtonsPerRow')
         self.text_size = self.GetInt('TextSize')
 
-        self.base_button = 0
         self.latefill_buttons = []
 
     def Iterate(self):
@@ -76,7 +75,6 @@ class IterableButton(IterableObject):
             for i in range(self.channel_count):
                 if i == 0:
                     cur_button = xml_iterable_buttons[0]
-                    self.base_button = cur_button
                 else:
                     cur_button = copy.deepcopy(xml_iterable_buttons[0])
 
