@@ -25,8 +25,13 @@ class IterableObject():
     def Iterate(self):
         pass
 
-    def GetChildNodes(self, parent_node: ET.Element, string: str, outer_offset: int):
-        search_string = f'.//*[key=\'{string}\']'
+    def GetChildNodes(self, parent_node: ET.Element, key: str, outer_offset: int):
+        search_string = f'.//*[key=\'{key}\']'
+        search_string += '..' * outer_offset
+        return parent_node.findall(search_string)
+        
+    def GetChildNodesByValue(self, parent_node: ET.Element, value: str, outer_offset: int):
+        search_string = f'.//*[value=\'{value}\']'
         search_string += '..' * outer_offset
         return parent_node.findall(search_string)
 
@@ -56,6 +61,9 @@ class IterableButton(IterableObject):
         self.buttons_per_row = self.GetInt('ButtonsPerRow')
         self.text_size = self.GetInt('TextSize')
 
+        self.base_button = 0
+        self.latefill_buttons = []
+
     def Iterate(self):
         xml_iterable_buttons_groups = self.GetChildNodes(self.root, 'iterableButton', 3)
 
@@ -68,6 +76,7 @@ class IterableButton(IterableObject):
             for i in range(self.channel_count):
                 if i == 0:
                     cur_button = xml_iterable_buttons[0]
+                    self.base_button = cur_button
                 else:
                     cur_button = copy.deepcopy(xml_iterable_buttons[0])
 
@@ -129,19 +138,39 @@ class IterableButton(IterableObject):
                     fader_obj = GetChildByName(cur_button, 'ChannelTrim')
                     SetMidiCC(fader_obj, midi_channel, midi_controller)
 
-                    
-                
                 # Scale child objects
                 children = cur_button.findall(".//node")
                 for child in children:
                         SetRect(child, 'frame', 0, 0, self.button_width, self.button_height)
 
-                # For all but the first button, update all UUIDs
-                if i > 0:
-                    SetNewUUIDs(cur_button)
-                        
-                    # Append new button
-                    group.append(cur_button)
+                # 
+                if i > 0:                        
+                    # Check if camera-specific
+                    cameras = self.__channel_config.GetPropertyValue('Cameras', self.channels[i])
+
+                    if cameras:
+                        self.latefill_buttons.append([cur_button, cameras])
+                    else:
+                        SetNewUUIDs(cur_button)
+                        group.append(cur_button)
+
+    def LateFill(self):
+        latefill_cameras = self.GetChildNodes(self.root, 'iterableCamera', 2)
+
+        for button in self.latefill_buttons:
+            for camera in latefill_cameras:
+                cam_name = GetProperty(camera, "cameraName")
+                if cam_name in button[1]:
+                    camera_channels = self.GetChildNodesByValue(camera, 'Channels', 2)
+                    if (camera_channels):
+                        new_button = copy.deepcopy(button[0])
+                        SetNewUUIDs(new_button)
+
+                        channels_children_node = GetImmediateChild(camera_channels[0], 'children')
+                        if (channels_children_node):
+                            channels_children_node.append(new_button)
+                            button_name = GetTextValue(new_button)
+                            print(f'Button \'{button_name}\' placed in {cam_name}')
 
 class AutoPager(IterableObject):
     def __init__(self, xml_root: ET.Element, config_file:str):

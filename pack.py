@@ -110,6 +110,10 @@ def Pack(xml_name):
         iterable_cameras = IObj.IterableCamera(root, layout_config_name, cameras_config_name)
         iterable_cameras.Iterate()
 
+    # Late-Fill Buttons
+    if iterable_buttons:
+        iterable_buttons.LateFill()
+
     main_data = ET.tostring(root, encoding='unicode')
 
     # Build specific changes

@@ -42,9 +42,13 @@ def GetChildByName(element: ET.Element, name: str):
 
 def GetChildByType(element: ET.Element, type: ObjType):
     children = element.findall(".//node")
-
     for child in children:
         if child.get('type') == type.name:
+            return child
+
+def GetImmediateChild(element: ET.Element, tag: str):
+    for child in element:
+        if child.tag == tag:
             return child
 
 def SetColor(element: ET.Element, color: tuple):
@@ -54,6 +58,10 @@ def SetColor(element: ET.Element, color: tuple):
     color_attribute = element.find(".//*[key='color']")
     for i in range(0, 4):
         color_attribute[1][i].text = f'{color[i]:.6f}'
+
+def GetTextValue(element: ET.Element):
+    text_element = element.find(".//*[key='text']")
+    return text_element[3].text
 
 def SetTextValue(element: ET.Element, value: str):
     text_element = element.find(".//*[key='text']")
