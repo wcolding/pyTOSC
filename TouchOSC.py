@@ -20,6 +20,10 @@ def HexToColorTuple(hex_string: str):
     a = int(hex_string[6:8], 16) / 255
     return (r,g,b,a)
 
+def GetProperty(element: ET.Element, name: str):
+    property = element.find(f".//*[key='{name}']")
+    return property[1].text
+
 def SetProperty(element: ET.Element, name: str, value: str):
     property = element.find(f".//*[key='{name}']")
     property[1].text = value
