@@ -4,11 +4,12 @@ import math
 from pyTOSC.TouchOSC import *
 
 class IterableObject():
-    def __init__(self, config_file: str, header: str = 'Default'):
+    def __init__(self, xml_root: ET.Element, config_file: str, header: str = 'Default'):
         self.__configparser = ConfigParser()
         self.__configparser.read(config_file)
         self.__header = header
         self.sections = self.__configparser.sections()
+        self.root = xml_root
 
     def GetPropertyValue(self, property: str, header: str = ''):
         header = header or self.__header
@@ -21,23 +22,23 @@ class IterableObject():
         except(TypeError, ValueError):
             return 0
 
-    def Iterate(self, root: ET.Element):
+    def Iterate(self):
         pass
 
 
 class IterableButton(IterableObject):
-    def __init__(self, layout_config: str, channel_config: str = "Default", colors_config: str = "colors.ini"):
-        super().__init__(layout_config, 'Buttons')
+    def __init__(self, xml_root: ET.Element, layout_config: str, channel_config: str = "Default", colors_config: str = "colors.ini"):
+        super().__init__(xml_root, layout_config, 'Buttons')
 
         self.auto_channels = self.GetInt('AutoChannels')
         self.channel_count = self.auto_channels
 
         if channel_config != "Default" and self.auto_channels == 0:
-            self.__channel_config = IterableObject(channel_config)
+            self.__channel_config = IterableObject(xml_root, channel_config)
             self.channels = self.__channel_config.sections
             self.channel_count = len(self.channels)
 
-        self.__colors_config = IterableObject(colors_config)
+        self.__colors_config = IterableObject(xml_root, colors_config)
         
         self.grid_start_x = self.GetInt('GridStartX')
         self.grid_start_y = self.GetInt('GridStartY')
@@ -51,8 +52,8 @@ class IterableButton(IterableObject):
         self.buttons_per_row = self.GetInt('ButtonsPerRow')
         self.text_size = self.GetInt('TextSize')
 
-    def Iterate(self, root: ET.Element):
-        xml_iterable_buttons_groups = root.findall(".//*[key='iterableButton']......")
+    def Iterate(self):
+        xml_iterable_buttons_groups = self.root.findall(".//*[key='iterableButton']......")
 
         if len(xml_iterable_buttons_groups) < 1:
             return
@@ -139,12 +140,12 @@ class IterableButton(IterableObject):
                     group.append(cur_button)
 
 class AutoPager(IterableObject):
-    def __init__(self, config_file:str):
-        super().__init__(config_file, 'Default')
+    def __init__(self, xml_root: ET.Element, config_file:str):
+        super().__init__(xml_root, config_file, 'Default')
         self.tabs = self.sections
 
-    def Iterate(self, root: ET.Element):
-        xml_auto_pagers = root.findall(".//*[key='autoPager']....")
+    def Iterate(self):
+        xml_auto_pagers = self.root.findall(".//*[key='autoPager']....")
 
         if len(xml_auto_pagers) < 1:
             return
@@ -191,9 +192,9 @@ class AutoPager(IterableObject):
             print()
 
 class IterableCamera(IterableObject):
-    def __init__(self, layout_config: str, camera_config: str):
-        super().__init__(layout_config, 'Cameras')
-        self.__cam_config = IterableObject(camera_config)
+    def __init__(self, xml_root: ET.Element, layout_config: str, camera_config: str):
+        super().__init__(xml_root, layout_config, 'Cameras')
+        self.__cam_config = IterableObject(xml_root, camera_config)
 
         self.cams_per_row = self.GetInt('CamerasPerRow')
 
@@ -208,8 +209,8 @@ class IterableCamera(IterableObject):
 
         self.cameras = self.__cam_config.sections
 
-    def Iterate(self, root: ET.Element):
-        xml_iterable_camera_groups = root.findall(".//*[key='iterableCamera']......")
+    def Iterate(self):
+        xml_iterable_camera_groups = self.root.findall(".//*[key='iterableCamera']......")
 
         if len(xml_iterable_camera_groups) < 1:
             return

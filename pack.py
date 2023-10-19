@@ -97,18 +97,18 @@ def Pack(xml_name):
 
     if valid_layout and VerifyConfig(channels_config_name):
         print(f'Button config found: {channels_config_name}')
-        iterable_buttons = IObj.IterableButton(layout_config_name, channels_config_name)
-        iterable_buttons.Iterate(root)
+        iterable_buttons = IObj.IterableButton(root, layout_config_name, channels_config_name)
+        iterable_buttons.Iterate()
 
     if VerifyConfig(tabs_config_name):
         print(f'Tabs config found: {tabs_config_name}')
-        auto_pagers = IObj.AutoPager(tabs_config_name)
-        auto_pagers.Iterate(root)
+        auto_pagers = IObj.AutoPager(root, tabs_config_name)
+        auto_pagers.Iterate()
 
     if valid_layout and VerifyConfig(cameras_config_name):
         print(f'Camera config found: {cameras_config_name}')
-        iterable_cameras = IObj.IterableCamera(layout_config_name, cameras_config_name)
-        iterable_cameras.Iterate(root)
+        iterable_cameras = IObj.IterableCamera(root, layout_config_name, cameras_config_name)
+        iterable_cameras.Iterate()
 
     main_data = ET.tostring(root, encoding='unicode')
 
