@@ -25,6 +25,10 @@ class IterableObject():
     def Iterate(self):
         pass
 
+    def GetChildNodes(self, parent_node: ET.Element, string: str, outer_offset: int):
+        search_string = f'.//*[key=\'{string}\']'
+        search_string += '..' * outer_offset
+        return parent_node.findall(search_string)
 
 class IterableButton(IterableObject):
     def __init__(self, xml_root: ET.Element, layout_config: str, channel_config: str = "Default", colors_config: str = "colors.ini"):
@@ -53,13 +57,13 @@ class IterableButton(IterableObject):
         self.text_size = self.GetInt('TextSize')
 
     def Iterate(self):
-        xml_iterable_buttons_groups = self.root.findall(".//*[key='iterableButton']......")
+        xml_iterable_buttons_groups = self.GetChildNodes(self.root, 'iterableButton', 3)
 
         if len(xml_iterable_buttons_groups) < 1:
             return
         
         for group in xml_iterable_buttons_groups:
-            xml_iterable_buttons = group.findall(".//*[key='iterableButton']....")
+            xml_iterable_buttons = self.GetChildNodes(group, 'iterableButton', 2)
         
             for i in range(self.channel_count):
                 if i == 0:
@@ -145,7 +149,7 @@ class AutoPager(IterableObject):
         self.tabs = self.sections
 
     def Iterate(self):
-        xml_auto_pagers = self.root.findall(".//*[key='autoPager']....")
+        xml_auto_pagers = self.GetChildNodes(self.root, 'autoPager', 2)
 
         if len(xml_auto_pagers) < 1:
             return
@@ -210,14 +214,14 @@ class IterableCamera(IterableObject):
         self.cameras = self.__cam_config.sections
 
     def Iterate(self):
-        xml_iterable_camera_groups = self.root.findall(".//*[key='iterableCamera']......")
+        xml_iterable_camera_groups = self.GetChildNodes(self.root, 'iterableCamera', 3)
 
         if len(xml_iterable_camera_groups) < 1:
             return
 
         print(f'Cameras defined: {self.cameras}')
         for group in xml_iterable_camera_groups:
-            xml_iterable_cameras = group.findall(".//*[key='iterableCamera']....")
+            xml_iterable_cameras = self.GetChildNodes(group, 'iterableCamera', 2)
 
             for i in range(len(self.cameras)):
                 if i == 0:
