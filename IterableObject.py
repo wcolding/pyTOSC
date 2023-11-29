@@ -46,6 +46,8 @@ class IterableButton(IterableObject):
             self.__channel_config = IterableObject(xml_root, channel_config)
             self.channels = self.__channel_config.sections
             self.channel_count = len(self.channels)
+        else:
+            self.__channel_config = None
 
         self.__colors_config = IterableObject(xml_root, colors_config)
         
@@ -141,10 +143,12 @@ class IterableButton(IterableObject):
                 for child in children:
                         SetRect(child, 'frame', 0, 0, self.button_width, self.button_height)
 
-                # 
-                if i > 0:                        
-                    # Check if camera-specific
-                    cameras = self.__channel_config.GetPropertyValue('Cameras', self.channels[i])
+                # Add button
+                if i > 0:  
+                    cameras = None
+                    if self.__channel_config != None:                      
+                        # Check if camera-specific
+                        cameras = self.__channel_config.GetPropertyValue('Cameras', self.channels[i])
 
                     if cameras:
                         self.latefill_buttons.append([cur_button, cameras])
@@ -153,6 +157,9 @@ class IterableButton(IterableObject):
                         group.append(cur_button)
 
     def LateFill(self):
+        if self.__channel_config == None:
+            return
+        
         latefill_cameras = self.GetChildNodes(self.root, 'iterableCamera', 2)
 
         for button in self.latefill_buttons:

@@ -94,10 +94,17 @@ def Pack(xml_name):
 
     # Second pass to duplicate iterable objects
     valid_layout = VerifyConfig(layout_config_name)
+    iterable_buttons = None
 
-    if valid_layout and VerifyConfig(channels_config_name):
-        print(f'Button config found: {channels_config_name}')
-        iterable_buttons = IObj.IterableButton(root, layout_config_name, channels_config_name)
+    if valid_layout:
+        passed_channels_config = ""
+        if VerifyConfig(channels_config_name):
+            print(f'Button config found: {channels_config_name}')
+            passed_channels_config = channels_config_name
+        else:
+            passed_channels_config = "Default"
+            
+        iterable_buttons = IObj.IterableButton(root, layout_config_name, passed_channels_config)
         iterable_buttons.Iterate()
 
     if VerifyConfig(tabs_config_name):
